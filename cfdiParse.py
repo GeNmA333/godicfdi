@@ -2,6 +2,7 @@ import os
 import csv
 import xml.etree.ElementTree as ET
 import argparse
+import sys
 
 # Crear el parser de argumentos
 parser = argparse.ArgumentParser(description="Convierte archivos XML a CSV")
@@ -27,6 +28,11 @@ for filename in os.listdir(args.folder_path):
             cfdi_dict.update(child.attrib)
 
         cfdi_data.append(cfdi_dict)
+
+
+if cfdi_data.__len__() == 0:
+    print("No hubo CFDIs")
+    sys.exit(0)
 
 # Escribir los datos en un archivo CSV
 with open(args.csv_path, "w", newline="") as csv_file:
