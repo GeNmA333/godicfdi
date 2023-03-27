@@ -4,6 +4,13 @@ import xml.etree.ElementTree as ET
 import argparse
 import sys
 
+NOMINA12 = "{http://www.sat.gob.mx/nomina12}"
+NOMINA = f"{NOMINA12}Nomina"
+PERCEPCIONES = f"{NOMINA12}Percepciones"
+PERCEPCION = f"{NOMINA12}Percepcion"
+DEDUCCIONES = f"{NOMINA12}Deducciones"
+DEDUCCION = f"{NOMINA12}Deduccion"
+
 # Crear el parser de argumentos
 parser = argparse.ArgumentParser(description="Convierte archivos XML a CSV")
 parser.add_argument("--folder_path", default=".", help="Ruta al folder que contiene los archivos XML")
@@ -22,12 +29,20 @@ for filename in os.listdir(args.folder_path):
         # Leer el archivo XML y extraer los datos necesarios
         tree = ET.parse(xml_path)
         root = tree.getroot()
+        version = root.attrib.get("Version")
+        if(version=="3.3"):
+            cfd = "{http://www.sat.gob.mx/cfd/3}"
+        else:
+            cfd = "{http://www.sat.gob.mx/cfd/4}"
+        COMPLEMENTO = f"{cfd}Complemento"
 
         cfdi_dict = {}
-        for child in root.iter("{http://www.sat.gob.mx/cfd/3}Comprobante"):
-            cfdi_dict.update(child.attrib)
+        for child in root.findall(f"./{COMPLEMENTO}/{NOMINA}"):
+            if(child.attrib.__len__!=0):
+                cfdi_dict.update(child.attrib)
 
-        cfdi_data.append(cfdi_dict)
+        if(cfdi_dict.__len__()!=0):
+            cfdi_data.append(cfdi_dict)
 
 
 if cfdi_data.__len__() == 0:
